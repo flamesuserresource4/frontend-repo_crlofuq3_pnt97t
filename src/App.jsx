@@ -1,28 +1,83 @@
-import { useState } from 'react'
+import React, { useMemo, useState } from 'react';
+import Hero from './components/Hero';
+import PreviewControls from './components/PreviewControls';
+import AppStorePreview from './components/AppStorePreview';
+import PlayStorePreview from './components/PlayStorePreview';
+import { Apple, Play } from 'lucide-react';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [state, setState] = useState({
+    icon: '',
+    screenshots: '',
+    feature: '',
+    name: 'NovaTasks',
+    subtitle: 'Plan. Focus. Finish.'
+  });
+
+  // Example defaults for a quick demo look
+  const merged = useMemo(() => {
+    const defaults = {
+      icon:
+        'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=256&auto=format&fit=crop',
+      feature:
+        'https://images.unsplash.com/photo-1557682268-e3955ed5d83f?q=80&w=1600&auto=format&fit=crop',
+      screenshots:
+        'https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1080&auto=format&fit=crop, https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1080&auto=format&fit=crop, https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1080&auto=format&fit=crop'
+    };
+    return {
+      ...defaults,
+      ...state,
+    };
+  }, [state]);
+
+  const [store, setStore] = useState('appstore');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
+    <div className="min-h-dvh w-full bg-slate-950 text-white">
+      <Hero />
+      <PreviewControls values={state} onChange={setState} />
+
+      <div className="mx-auto mt-8 w-full max-w-6xl px-6">
+        <div className="inline-flex overflow-hidden rounded-full border border-white/10 bg-white/5 p-1 text-sm backdrop-blur">
           <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 transition ${
+              store === 'appstore' ? 'bg-white text-slate-900' : 'text-white/80 hover:text-white'
+            }`}
+            onClick={() => setStore('appstore')}
           >
-            Count is {count}
+            <Apple className="h-4 w-4" /> App Store
+          </button>
+          <button
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 transition ${
+              store === 'playstore' ? 'bg-white text-slate-900' : 'text-white/80 hover:text-white'
+            }`}
+            onClick={() => setStore('playstore')}
+          >
+            <Play className="h-4 w-4" /> Google Play
           </button>
         </div>
       </div>
-    </div>
-  )
-}
 
-export default App
+      {store === 'appstore' ? (
+        <AppStorePreview
+          icon={merged.icon}
+          name={merged.name}
+          subtitle={merged.subtitle}
+          screenshots={merged.screenshots}
+        />
+      ) : (
+        <PlayStorePreview
+          icon={merged.icon}
+          name={merged.name}
+          subtitle={merged.subtitle}
+          screenshots={merged.screenshots}
+          feature={merged.feature}
+        />
+      )}
+
+      <footer className="mx-auto w-full max-w-6xl px-6 pb-16 text-center text-xs text-white/50">
+        Built for previewing store listings. Drag the window to see responsive behavior.
+      </footer>
+    </div>
+  );
+}
